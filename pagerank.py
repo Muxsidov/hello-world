@@ -9,6 +9,7 @@ from collections import Counter
 DAMPING = 0.85
 SAMPLES = 10000
 
+
 def main():
     if len(sys.argv) != 2:
         sys.exit("Usage: python pagerank.py corpus")
@@ -21,6 +22,7 @@ def main():
     print(f"PageRank Results from Iteration")
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
+
 
 def crawl(directory):
     """
@@ -48,6 +50,7 @@ def crawl(directory):
 
     return pages
 
+
 def transition_model(corpus, page, damping_factor):
     """
     Return a probability distribution over which page to visit next,
@@ -59,11 +62,9 @@ def transition_model(corpus, page, damping_factor):
     """
     # Number of page's values(links)
     links_on_page = len(corpus.get(page))
-    #print(links_on_page)
 
     # Number of pages on corpus
     links_on_corpus = len(corpus)
-    #print(links_on_corpus)
 
     # If page has no links then return probability distribution that chooses randomly among all pages
     if len(page) == 0:
@@ -114,6 +115,7 @@ def sample_pagerank(corpus, damping_factor, n):
     for i in range(n):
         trans_of_previous = transition_model(corpus, sample[-1], damping_factor)
 
+        # Iterate over a dict and add page to anot_list according it's transition_model
         for key, value in trans_of_previous.items():
             anot_list.extend([key] * round(value * h))
 
@@ -124,6 +126,7 @@ def sample_pagerank(corpus, damping_factor, n):
     for k, v in return_d.items():
         return_d[k] = (value / n)
     print(return_d)
+    return return_d
 
 
 def iterate_pagerank(corpus, damping_factor):
@@ -136,22 +139,57 @@ def iterate_pagerank(corpus, damping_factor):
     PageRank values should sum to 1.
     """
     # Number of pages on corpus
-    links_on_corpus = len(corpus)
-    #print(links_on_corpus)
+    N = len(corpus)
 
-    dict_ite_page = dict.fromkeys(deepcopy(corpus), (1 / links_on_corpus))
+    # Another dict for using it in while loop 
+    return_di = {}
 
-    #while
-    # If Page has no links it "has" link for every page
-    #if len(page) == 0:
-
+    # Copying corpus and giving each page a PageRank value
+    dict_ite_page = dict.fromkeys(deepcopy(corpus), (1 / N))
     
- #   else:
-#        for i in range(len(#pageni dict da nechta value si bo'lsa)):
-#            sum += PR(i) / NumLinks(i)
+    # Declaring a variable for storing difference between this and previous PR
+    j = 0
 
-    #    PR(p) = ((1 - d) / links_on_corpus)
-    
+    # Just a variable for adding rank to "right" dict 
+    a = 1
+
+    # Subtract from 2 nd values 1 st one
+    for v, v1 in zip(dict_ite_page, return_di):
+        #print("U have come till here")
+        j += abs(v - v1)
+        
+    # Repeat calculating PageRank untill it changes by 0.001
+    if ((j / len(corpus)) > 0.001):
+        for (k, v), (k2, v2) in zip(dict_ite_page.items(), return_di.items()):
+            if (a % 2 == 0):
+                v = ((1 - d) / N) + d * summ(k)
+            else:
+                v2 = ((1 - d) / N) + d * summ(k)
+        return return_di
+    else:
+        return return_di
+
+
+def summ(page, corpus, dict_ite_page):
+    # Variable for Number of links on page
+    NumLinks = 0
+
+    # Variable for PageRank of page
+    PR = 0
+
+    summ = 0
+
+    for k, v in corpus:
+        if (v == page):
+            
+            NumLinks = len(corpus.get(k))
+
+            PR = dict_ite_page[k]
+
+    # Calcuate sum of all
+    summ += PR / NumLinks
+
+    return summ
 
 if __name__ == "__main__":
     main()
